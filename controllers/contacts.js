@@ -5,12 +5,40 @@ const { joiSchema } = require("../models/contact");
 const { Contact } = require("../models");
 
 const getAll = async (req, res, next) => {
-  const allContacts = await Contact.find({}, "_id name email favorite");
+  const { page = 1, limit = 20 } = req.query;
+  const { favorite } = req.query;
+  const { _id } = req.user;
+
+  const skip = (page - 1) * limit;
+
+  if (favorite) {
+    const favoriteContacts = await Contact.find(
+      { owner: _id, favorite },
+      "_id name email phone favorite ",
+      { skip: skip, limit: +limit }
+    ).populate("owner", "email");
+
+    res.json({
+      status: "success",
+      code: 200,
+      data: {
+        contacts: favoriteContacts,
+      },
+    });
+    return;
+  }
+
+  const allContacts = await Contact.find(
+    { owner: _id },
+    "_id name email phone favorite ",
+    { skip: skip, limit: +limit }
+  ).populate("owner", "email");
+
   res.json({
     status: "success",
     code: 200,
     data: {
-      allContacts,
+      contacts: allContacts,
     },
   });
 };
