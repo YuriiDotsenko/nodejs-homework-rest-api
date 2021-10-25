@@ -1,10 +1,24 @@
 const express = require("express");
 
-const { authenticate } = require("../../middlewares");
+const {
+  controllerWrapper,
+  authenticate,
+  upload,
+} = require("../../middlewares");
 const { users: ctrl } = require("../../controllers");
 const router = express.Router();
 
-router.get("/current", authenticate, ctrl.getCurrent);
-router.patch("/current", authenticate, ctrl.updateSubscription);
+router.get("/current", authenticate, controllerWrapper(ctrl.getCurrent));
+router.patch(
+  "/current",
+  authenticate,
+  controllerWrapper(ctrl.updateSubscription)
+);
+router.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  controllerWrapper(ctrl.updateAvatar)
+);
 
 module.exports = router;
