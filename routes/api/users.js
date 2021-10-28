@@ -14,6 +14,9 @@ router.patch(
   authenticate,
   controllerWrapper(ctrl.updateSubscription)
 );
+
+router.get("/verify/:verificationToken", controllerWrapper(ctrl.verify));
+
 router.patch(
   "/avatars",
   authenticate,
